@@ -203,6 +203,57 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     Ok(())
 }
 
+/// Retrieves pool data for a given pair of tokens and a time range.
+///
+/// # Query Parameters
+///
+/// - `token_a` (string, required): The address of the first token.
+/// - `token_b` (string, required): The address of the second token.
+/// - `start_timestamp` (integer, required): The start timestamp in Unix format.
+/// - `end_timestamp` (integer, required): The end timestamp in Unix format.
+/// - `interval` (string, optional): The interval for data aggregation (default: "1h").
+///
+/// # Example Request
+///
+/// ```sh
+/// curl -X GET "http://localhost:8080/pool-data?token_a=0xTokenAAddress&token_b=0xTokenBAddress&start_timestamp=1638316800&end_timestamp=1638403200&interval=1h"
+/// ```
+///
+/// # Success Response
+///
+/// - **Code**: `200 OK`
+/// - **Content**:
+///
+/// ```json
+/// {
+///     "token_a": "0xTokenAAddress",
+///     "token_b": "0xTokenBAddress",
+///     "start_timestamp": 1638316800,
+///     "end_timestamp": 1638403200,
+///     "interval": "1h",
+///     "data": "some pool data"
+/// }
+/// ```
+///
+/// # Error Responses
+///
+/// - **Code**: `400 Bad Request`
+/// - **Content**:
+///
+/// ```json
+/// {
+///     "error": "Invalid input: Token addresses cannot be empty"
+/// }
+/// ```
+///
+/// - **Code**: `500 Internal Server Error`
+/// - **Content**:
+///
+/// ```json
+/// {
+///     "error": "Unknown error"
+/// }
+/// ```
 async fn get_pool_data(Query(params): Query<PoolDataQuery>) -> Json<Value> {
     // Extract the query parameters
     let token_a = &params.token_a;
@@ -218,6 +269,23 @@ async fn get_pool_data(Query(params): Query<PoolDataQuery>) -> Json<Value> {
     }
 }
 
+/// Fetches pool data for a given pair of tokens and a time range.
+///
+/// # Arguments
+///
+/// - `token_a`: The address of the first token.
+/// - `token_b`: The address of the second token.
+/// - `start_timestamp`: The start timestamp in Unix format.
+/// - `end_timestamp`: The end timestamp in Unix format.
+/// - `interval`: The interval for data aggregation.
+///
+/// # Returns
+///
+/// A JSON value containing the pool data.
+///
+/// # Errors
+///
+/// Returns an error if the data fetching fails.
 async fn fetch_pool_data(token_a: &str, token_b: &str, start_datetime: &str, end_datetime: &str, interval: &str) -> Result<Value, Box<dyn std::error::Error + Send + Sync>> {
     
     // Connect to the Ethereum provider
